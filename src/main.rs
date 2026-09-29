@@ -1,4 +1,4 @@
-use log::error;
+use log::{error, info};
 use thirtyfour::{DesiredCapabilities, WebDriver};
 
 use crate::{
@@ -25,6 +25,8 @@ async fn main() -> anyhow::Result<()> {
     authenticate_in_driver(&driver, &config.credentials)
         .await
         .inspect_err(|e| error!("Klaida prisijungiant: {}", e))?;
+
+    info!("Prisijungta");
 
     let mut buf = String::new();
     std::io::stdin().read_line(&mut buf).expect("");

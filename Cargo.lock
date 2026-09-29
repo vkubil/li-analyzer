@@ -7,6 +7,7 @@ name = "Intern"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "const_format",
  "env_logger",
  "futures",
  "log",

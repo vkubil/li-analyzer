@@ -1,3 +1,4 @@
+use const_format::concatcp;
 use futures::future::join_all;
 use log::{debug, warn};
 use thirtyfour::{
@@ -9,10 +10,11 @@ use crate::{config::ConfigCredentials, util::elements::wait_until_element_gone};
 const EMAIL_INPUT: &str = "input[type=\"email\"]";
 const PASSWORD_INPUT: &str = "input[type=\"password\"]";
 const SIGN_IN_BUTTON: &str = "button[type=\"button\"]";
-const LOGIN_PAGE: &str = "https://linkedin.com/login/";
+const LOGIN_PAGE_ROUTE: &str = "/login/";
+const LOGIN_PAGE: &'static str = concatcp!("https://linkedin.com", LOGIN_PAGE_ROUTE);
 const SIGN_IN_BUTTON_TEXT: &str = "Sign in";
 
-const CHECKPOINT_URL: &str = "/checkpoint/challengesV2";
+const CHECKPOINT_URL: &str = "/checkpoint/challenge";
 const LOGIN_PAGE_ID: &str = "root";
 const CHALLENGE_PAGE_ID: &str = "app__container";
 
@@ -57,19 +59,33 @@ pub async fn authenticate_in_driver(
     sign_in.click().await?;
 
     debug!("Laukiama, kada pasikeis puslapis");
-
-    // Nera kaip kitaip suzinoti, kada puslapis pasikeicia
-    wait_until_element_gone(driver, By::Id(LOGIN_PAGE_ID)).await?;
+    wait_for_auth(driver).await?;
 
     // Gauti URL po paspaudimo
     let url = driver.current_url().await?;
     debug!("Puslapis pasikeite. Naujas URL: {}", url);
 
     if url.path().starts_with(CHECKPOINT_URL) {
-        warn!("Prašoma įvykdyti paskyros patvirtinimą per telefoninę programėlę.");
+        warn!(
+            "Prašoma įvykdyti paskyros patvirtinimą per telefoninę programėlę ar, kad nesate robotas."
+        );
         // Kad nereiketu ir cia paspausti enter ar panasiai
         wait_until_element_gone(driver, By::Id(CHALLENGE_PAGE_ID)).await?;
     }
+
+    Ok(())
+}
+
+pub async fn wait_for_auth(driver: &WebDriver) -> Result<(), anyhow::Error> {
+    let url = driver.current_url().await?;
+
+    if url.path() != LOGIN_PAGE_ROUTE {
+        warn!("Per greitai pasikeitė puslapis: {}", url);
+        return Ok(());
+    }
+
+    // Nera kaip kitaip suzinoti, kada puslapis pasikeicia
+    wait_until_element_gone(driver, By::Id(LOGIN_PAGE_ID)).await?;
 
     Ok(())
 }
