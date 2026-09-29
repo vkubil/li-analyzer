@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.104"
+futures = "0.3.34"
 serde = "1.0.229"
 thirtyfour = "0.37.5"
 tokio = { version = "1.53.1", features = ["rt-multi-thread"] }

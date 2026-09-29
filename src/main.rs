@@ -11,6 +11,9 @@ async fn main() -> anyhow::Result<()> {
 
     authenticate_in_driver(&driver, &config.credentials).await?;
 
+    let mut buf = String::new();
+    std::io::stdin().read_line(&mut buf).expect("Err");
+
     driver.quit().await?;
 
     Ok(())
@@ -18,3 +21,4 @@ async fn main() -> anyhow::Result<()> {
 
 mod auth;
 mod config;
+mod util;
