@@ -1,3 +1,6 @@
+[logging]
+verbose = true
+
 [credentials]
 email = "vardenis.pavardenis@example.com"
 password = "abc"

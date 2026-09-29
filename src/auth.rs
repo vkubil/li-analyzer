@@ -1,4 +1,5 @@
 use futures::future::join_all;
+use log::{debug, warn};
 use thirtyfour::{
     By, WebDriver, WebElement, error::WebDriverError, extensions::query::ElementQueryable,
 };
@@ -15,6 +16,12 @@ const CHECKPOINT_URL: &str = "/checkpoint/challengesV2";
 const LOGIN_PAGE_ID: &str = "root";
 const CHALLENGE_PAGE_ID: &str = "app__container";
 
+#[derive(thiserror::Error, Debug)]
+pub enum LoginError {
+    #[error("Nebuvo rastas prisijungimo mygtukas")]
+    SignInButtonNotFound,
+}
+
 pub async fn authenticate_in_driver(
     driver: &WebDriver,
     credentials: &ConfigCredentials,
@@ -30,6 +37,8 @@ pub async fn authenticate_in_driver(
     )
     .await?;
 
+    debug!("Prisijungimo duomenys suvesti");
+
     // Nes sunku suzinoti, kuris is ju yra prisijungimo mygtukas, tai mums reikes perziureti visus mygtukus
     // ir rasti kuris is ju yra 'Sign in'
     let sign_ins = driver
@@ -41,19 +50,23 @@ pub async fn authenticate_in_driver(
 
     let sign_in = find_actual_sign_in(&sign_ins)
         .await
-        .expect("Negali rasti 'Sign in' mygtuko");
+        .ok_or(LoginError::SignInButtonNotFound)
+        .inspect_err(|e| log::error!("{}", e))?;
 
+    debug!("Spaudžiamas prisijungimo mygtukas");
     sign_in.click().await?;
+
+    debug!("Laukiama, kada pasikeis puslapis");
 
     // Nera kaip kitaip suzinoti, kada puslapis pasikeicia
     wait_until_element_gone(driver, By::Id(LOGIN_PAGE_ID)).await?;
 
     // Gauti URL po paspaudimo
     let url = driver.current_url().await?;
-    println!("URL: {}", url);
+    debug!("Puslapis pasikeite. Naujas URL: {}", url);
 
     if url.path().starts_with(CHECKPOINT_URL) {
-        println!("Prašoma įvykdyti paskyros patvirtinimą per telefoninę programėlę.");
+        warn!("Prašoma įvykdyti paskyros patvirtinimą per telefoninę programėlę.");
         // Kad nereiketu ir cia paspausti enter ar panasiai
         wait_until_element_gone(driver, By::Id(CHALLENGE_PAGE_ID)).await?;
     }
