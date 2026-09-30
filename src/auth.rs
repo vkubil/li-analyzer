@@ -2,7 +2,9 @@ use const_format::concatcp;
 use futures::future::join_all;
 use log::{debug, warn};
 use thirtyfour::{
-    By, WebDriver, WebElement, error::WebDriverError, extensions::query::ElementQueryable,
+    By, WebDriver, WebElement,
+    error::{WebDriverError, WebDriverErrorInner},
+    extensions::query::ElementQueryable,
 };
 
 use crate::{config::ConfigCredentials, util::elements::wait_until_element_gone};
@@ -15,7 +17,8 @@ const LOGIN_PAGE: &'static str = concatcp!("https://linkedin.com", LOGIN_PAGE_RO
 const SIGN_IN_BUTTON_TEXT: &str = "Sign in";
 
 const CHECKPOINT_URL: &str = "/checkpoint/challenge";
-const LOGIN_PAGE_ID: &str = "root";
+const FLAGSHIP_URL: &str = "/flagship-web/";
+const PAGE_ID: &str = "root";
 const CHALLENGE_PAGE_ID: &str = "app__container";
 
 #[derive(thiserror::Error, Debug)]
@@ -71,6 +74,33 @@ pub async fn authenticate_in_driver(
         );
         // Kad nereiketu ir cia paspausti enter ar panasiai
         wait_until_element_gone(driver, By::Id(CHALLENGE_PAGE_ID)).await?;
+
+        debug!("Įvykdytas patvirtinimas");
+        wait_for_flagship(driver).await?;
+    }
+
+    Ok(())
+}
+
+// Nes LinkedIn turi buti keistas
+pub async fn wait_for_flagship(driver: &WebDriver) -> Result<(), anyhow::Error> {
+    let url = driver.current_url().await?;
+
+    debug!("URL po patvirtinimo: {}", url);
+    if url.path().starts_with(FLAGSHIP_URL) {
+        debug!("Flagship puslapis rastas");
+
+        match wait_until_element_gone(driver, By::Id(PAGE_ID)).await {
+            Err(e) => match e.into_inner() {
+                WebDriverErrorInner::Timeout(_) => {
+                    debug!("Flagship elementas nerastas");
+                }
+                other => {
+                    return Err(other.into());
+                }
+            },
+            Ok(_) => {}
+        }
     }
 
     Ok(())
@@ -85,7 +115,7 @@ pub async fn wait_for_auth(driver: &WebDriver) -> Result<(), anyhow::Error> {
     }
 
     // Nera kaip kitaip suzinoti, kada puslapis pasikeicia
-    wait_until_element_gone(driver, By::Id(LOGIN_PAGE_ID)).await?;
+    wait_until_element_gone(driver, By::Id(PAGE_ID)).await?;
 
     Ok(())
 }
