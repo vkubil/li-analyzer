@@ -1,1 +1,1 @@
-# linkedin-scraper
+# li-analyzer
