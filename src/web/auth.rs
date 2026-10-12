@@ -7,7 +7,7 @@ use thirtyfour::{
     extensions::query::ElementQueryable,
 };
 
-use crate::{config::ConfigCredentials, util::elements::wait_until_element_gone};
+use crate::{config::ConfigCredentials, web::util::elements::wait_until_element_gone};
 
 const EMAIL_INPUT: &str = "input[type=\"email\"]";
 const PASSWORD_INPUT: &str = "input[type=\"password\"]";

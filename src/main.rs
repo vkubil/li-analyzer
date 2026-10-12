@@ -1,10 +1,8 @@
-use log::{error, info};
-use thirtyfour::{DesiredCapabilities, WebDriver};
-
 use crate::{
-    auth::authenticate_in_driver,
     config::{create_logger, read_config},
+    ui::{app::ApplicationState, subscription::subscription},
 };
+use log::error;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -20,22 +18,29 @@ async fn main() -> anyhow::Result<()> {
 
     create_logger(&config.logging);
 
-    let caps = DesiredCapabilities::firefox();
-    let driver = WebDriver::managed(caps).await?;
-    authenticate_in_driver(&driver, &config.credentials)
-        .await
-        .inspect_err(|e| error!("Klaida prisijungiant: {}", e))?;
+    // let caps = DesiredCapabilities::firefox();
+    // let driver = WebDriver::managed(caps).await?;
+    // authenticate_in_driver(&driver, &config.credentials)
+    //     .await
+    //     .inspect_err(|e| error!("Klaida prisijungiant: {}", e))?;
 
-    info!("Prisijungta");
+    // info!("Prisijungta");
 
-    let mut buf = String::new();
-    std::io::stdin().read_line(&mut buf).expect("");
+    // let mut buf = String::new();
+    // std::io::stdin().read_line(&mut buf).expect("");
 
-    driver.quit().await?;
+    // driver.quit().await?;
 
-    Ok(())
+    iced::application(
+        ApplicationState::default,
+        crate::ui::update::update,
+        crate::ui::view::view,
+    )
+    .subscription(subscription)
+    .run()
+    .map_err(|err| err.into())
 }
 
-mod auth;
-mod config;
-mod util;
+pub mod config;
+pub mod ui;
+pub mod web;
