@@ -1,4 +1,4 @@
-use iced::widget::pane_grid::{self, Axis, Pane};
+use iced::widget::pane_grid::{self, Axis};
 
 use crate::ui::panes::UiPane;
 

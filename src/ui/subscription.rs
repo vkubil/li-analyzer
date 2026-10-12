@@ -6,7 +6,7 @@ use log::info;
 
 use crate::ui::{app::ApplicationState, state::Message};
 
-pub fn subscription(state: &ApplicationState) -> Subscription<Message> {
+pub fn subscription(_: &ApplicationState) -> Subscription<Message> {
     keyboard::listen().filter_map(|event| {
         let keyboard::Event::KeyPressed { key, modifiers, .. } = event else {
             return None;
