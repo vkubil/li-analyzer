@@ -2,6 +2,7 @@ use crate::{
     config::{create_logger, read_config},
     ui::{app::ApplicationState, subscription::subscription},
 };
+use iced::Theme;
 use log::error;
 
 #[tokio::main]
@@ -36,6 +37,7 @@ async fn main() -> anyhow::Result<()> {
         crate::ui::update::update,
         crate::ui::view::view,
     )
+    .theme(Theme::CatppuccinMocha)
     .subscription(subscription)
     .run()
     .map_err(|err| err.into())

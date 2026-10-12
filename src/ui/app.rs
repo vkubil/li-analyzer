@@ -1,20 +1,22 @@
-use iced::widget::pane_grid::{self};
+use iced::widget::pane_grid::{self, Axis, Pane};
 
 use crate::ui::panes::UiPane;
 
 pub struct ApplicationState {
     pub panes: pane_grid::State<UiPane>,
-    pub focused_pane: Option<pane_grid::Pane>,
 }
 
 impl ApplicationState {
     pub fn new() -> Self {
-        let (panes, _) = pane_grid::State::new(UiPane::new(0));
+        let (mut panes, first_pane) =
+            pane_grid::State::new(UiPane::new(super::panes::PaneType::Data));
+        panes.split(
+            Axis::Horizontal,
+            first_pane,
+            UiPane::new(super::panes::PaneType::Fetch),
+        );
 
-        ApplicationState {
-            panes,
-            focused_pane: None,
-        }
+        ApplicationState { panes }
     }
 }
 impl Default for ApplicationState {
