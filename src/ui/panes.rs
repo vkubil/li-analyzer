@@ -1,3 +1,7 @@
+use iced::Element;
+
+use crate::ui::{pages, state::Message};
+
 pub enum PaneType {
     Fetch,
     Data,
@@ -8,6 +12,12 @@ impl PaneType {
         match self {
             PaneType::Data => "Duomenys".to_string(),
             PaneType::Fetch => "Eksportavimas ir Importavimas".to_string(),
+        }
+    }
+    pub fn view<'a>(&self) -> impl Fn() -> Element<'a, Message> {
+        match self {
+            PaneType::Data => pages::data::view,
+            PaneType::Fetch => pages::fetch::view,
         }
     }
 }

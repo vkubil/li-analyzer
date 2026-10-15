@@ -19,7 +19,9 @@ pub fn view(state: &ApplicationState) -> Element<'_, Message> {
             let title = create_pane_title(pane);
             let title_bar = create_pane_title_bar(title);
 
-            pane_grid::Content::new(text("Example pane"))
+            let pane_view = pane.r#type.view();
+
+            pane_grid::Content::new(pane_view())
                 .title_bar(title_bar)
                 .style(panes::style::pane)
         })
