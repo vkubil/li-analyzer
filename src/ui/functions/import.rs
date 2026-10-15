@@ -1,6 +1,9 @@
 use futures::future;
 use log::info;
+use regex::{Captures, Regex};
 use rfd::{AsyncFileDialog, FileHandle};
+
+const EXPRESSION: &str = "^(?:(?:https:\\/\\/linkedin.com\\/in)?[/])?([A-Za-z0-9\\-]+)(?:[/].*)?$";
 
 pub async fn import_graduate_files() -> anyhow::Result<Vec<String>, anyhow::Error> {
     let files = AsyncFileDialog::new()
@@ -21,15 +24,20 @@ pub async fn import_graduate_files() -> anyhow::Result<Vec<String>, anyhow::Erro
 
 pub async fn import_graduates(files: Vec<FileHandle>) -> anyhow::Result<Vec<String>> {
     let links_from_files = future::try_join_all(files.iter().map(read_links)).await?;
-    let links = links_from_files
-        .iter()
-        .flatten()
-        .cloned()
-        .collect::<Vec<String>>();
+    let links = links_from_files.iter().flatten().cloned();
 
     info!("Gauti URIs is failu: {:?}", links);
 
-    Ok(links)
+    let regex = Regex::new(EXPRESSION)?;
+    let results = links
+        .filter_map(|line| get_id(regex.captures(&line)))
+        .collect::<Vec<String>>();
+
+    Ok(results)
+}
+
+fn get_id(capture: Option<Captures<'_>>) -> Option<String> {
+    capture.map(|captures| captures.get(1).unwrap().as_str().to_string())
 }
 
 enum FileType {

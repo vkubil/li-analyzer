@@ -13,6 +13,7 @@ dependencies = [
  "futures",
  "iced",
  "log",
+ "regex",
  "rfd",
  "serde",
  "thirtyfour",
