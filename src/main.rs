@@ -44,5 +44,6 @@ async fn main() -> anyhow::Result<()> {
 }
 
 pub mod config;
+pub mod database;
 pub mod ui;
 pub mod web;
