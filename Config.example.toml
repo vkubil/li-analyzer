@@ -1,6 +1,9 @@
 [logging]
 verbose = true
 
+[database]
+database_url="file:data.db"
+
 [credentials]
 email = "vardenis.pavardenis@example.com"
 password = "abc"
