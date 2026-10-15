@@ -14,7 +14,7 @@ impl PaneType {
             PaneType::Fetch => "Eksportavimas ir Importavimas".to_string(),
         }
     }
-    pub fn view<'a>(&self) -> impl Fn() -> Element<'a, Message> {
+    pub fn view<'a>(&self) -> impl Fn() -> Result<Element<'a, Message>, anyhow::Error> {
         match self {
             PaneType::Data => pages::data::view,
             PaneType::Fetch => pages::fetch::view,
@@ -67,6 +67,19 @@ pub mod style {
                 color: palette.background.weaker.color,
                 width: 1.0,
                 radius: Radius::new(8),
+            },
+            ..Default::default()
+        }
+    }
+    pub fn pane_error(theme: &Theme) -> container::Style {
+        let palette = theme.extended_palette();
+
+        container::Style {
+            background: Some(palette.danger.weak.color.into()),
+            text_color: Some(palette.danger.weak.text.into()),
+            border: Border {
+                radius: Radius::new(4),
+                ..Border::default()
             },
             ..Default::default()
         }

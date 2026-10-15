@@ -12,15 +12,17 @@ fn id_view<'a>(value: ImportedGraduate) -> Element<'a, Message> {
     text(value.clone().id).into()
 }
 
-pub fn view<'a>() -> Element<'a, Message> {
+pub fn view<'a>() -> Result<Element<'a, Message>, anyhow::Error> {
     let conn = &mut establish_connection();
-    let graduates = imported_graduates::table
-        .load::<ImportedGraduate>(conn)
-        .expect("Negalėjo gauti importuotus absolventus");
+    let graduates = imported_graduates::table.load::<ImportedGraduate>(conn)?;
 
-    column![
+    Ok(column![
         scrollable(
-            table::table(vec![table::column(text("ID"), id_view),], graduates).width(Length::Fill)
+            table::table(
+                vec![table::column(text("Absolventas"), id_view),],
+                graduates
+            )
+            .width(Length::Fill)
         )
         .width(Length::Fill)
         .height(Length::Fill),
@@ -31,5 +33,5 @@ pub fn view<'a>() -> Element<'a, Message> {
     .spacing(2)
     .width(Length::Fill)
     .height(Length::Fill)
-    .into()
+    .into())
 }

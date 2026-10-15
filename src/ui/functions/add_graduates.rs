@@ -12,8 +12,7 @@ pub fn add_graduates(ids: Vec<String>) -> Result<usize, diesel::result::Error> {
         .map(|id| ImportedGraduate { id: id.to_string() })
         .collect::<Vec<ImportedGraduate>>();
 
-    diesel::insert_into(imported_graduates::table)
+    diesel::insert_or_ignore_into(imported_graduates::table)
         .values(values)
-        // FIXME .on_conflict_do_nothing()
         .execute(conn)
 }

@@ -1,7 +1,7 @@
 use iced::{
-    Element,
+    Element, Length,
     widget::{
-        PaneGrid, Row, column,
+        PaneGrid, Row, column, container,
         pane_grid::{self, TitleBar},
         row, text,
     },
@@ -21,9 +21,19 @@ pub fn view(state: &ApplicationState) -> Element<'_, Message> {
 
             let pane_view = pane.r#type.view();
 
-            pane_grid::Content::new(pane_view())
-                .title_bar(title_bar)
-                .style(panes::style::pane)
+            pane_grid::Content::new(match pane_view() {
+                Ok(elem) => elem,
+                Err(err) => container(
+                    container(text(format!("{:?}", err)))
+                        .padding(8)
+                        .width(Length::Fill)
+                        .style(panes::style::pane_error),
+                )
+                .padding(16)
+                .into(),
+            })
+            .title_bar(title_bar)
+            .style(panes::style::pane)
         })
         .spacing(8)
         .on_drag(Message::PaneDragged)
