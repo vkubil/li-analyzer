@@ -1,11 +1,17 @@
+use std::sync::LazyLock;
+
 use env_logger::Builder;
 use log::LevelFilter;
 use serde::Deserialize;
+
+pub static CONFIG: LazyLock<Config> =
+    LazyLock::new(|| read_config().expect("Negalėjo nuskaityti konfiguracijos failo"));
 
 #[derive(Deserialize)]
 pub struct Config {
     pub credentials: ConfigCredentials,
     pub logging: ConfigLogging,
+    pub database: ConfigDatabase,
 }
 #[derive(Deserialize)]
 pub struct ConfigCredentials {
@@ -15,6 +21,10 @@ pub struct ConfigCredentials {
 #[derive(Deserialize)]
 pub struct ConfigLogging {
     pub verbose: bool,
+}
+#[derive(Deserialize)]
+pub struct ConfigDatabase {
+    pub url: String,
 }
 
 const CONFIG_FILE: &str = "./Config.toml";

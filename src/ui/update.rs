@@ -34,8 +34,12 @@ pub fn update(state: &mut ApplicationState, message: Message) -> Task<Message> {
                 },
             )
         }
-        Message::Imported(result) => {
-            info!("Importuoti asmenys: {:?}", result);
+        Message::Imported(ids) => {
+            info!("Importuoti asmenys: {:?}", ids);
+            match functions::add_graduates::add_graduates(ids) {
+                Ok(count) => info!("Importuoti {} absolventai", count),
+                Err(err) => error!("{:?}", err),
+            };
             Task::none()
         }
         Message::PaneResized(pane_grid::ResizeEvent { split, ratio }) => {

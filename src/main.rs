@@ -1,23 +1,12 @@
 use crate::{
-    config::{create_logger, read_config},
+    config::{CONFIG, create_logger},
     ui::{app::ApplicationState, subscription::subscription},
 };
 use iced::Theme;
-use log::error;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let config = read_config();
-
-    if let Err(e) = config {
-        error!("Klaida nuskaitant konfiguraciją: {}", e);
-
-        return Err(e);
-    }
-
-    let config = config.unwrap();
-
-    create_logger(&config.logging);
+    create_logger(&CONFIG.logging);
 
     // let caps = DesiredCapabilities::firefox();
     // let driver = WebDriver::managed(caps).await?;
