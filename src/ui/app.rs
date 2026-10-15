@@ -11,7 +11,7 @@ impl ApplicationState {
         let (mut panes, first_pane) =
             pane_grid::State::new(UiPane::new(super::panes::PaneType::Data));
         panes.split(
-            Axis::Horizontal,
+            Axis::Vertical,
             first_pane,
             UiPane::new(super::panes::PaneType::Fetch),
         );

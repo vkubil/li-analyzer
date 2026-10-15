@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 
-#[derive(Queryable, Selectable, Insertable, Debug)]
+#[derive(Queryable, Selectable, Clone, Insertable, Debug)]
 #[diesel(table_name = crate::database::schema::imported_graduates)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct ImportedGraduate {
