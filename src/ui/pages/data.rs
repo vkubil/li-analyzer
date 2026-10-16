@@ -1,4 +1,3 @@
-use diesel::result::Error;
 use iced::Element;
 use iced::widget::text;
 

@@ -1,6 +1,6 @@
 use diesel::RunQueryDsl;
-use iced::alignment::Horizontal;
-use iced::widget::{button, column, scrollable, table, text};
+use iced::alignment::{Horizontal, Vertical};
+use iced::widget::{button, column, row, scrollable, table, text};
 use iced::{Element, Length};
 
 use crate::database::connection::establish_connection;
@@ -26,7 +26,13 @@ pub fn view<'a>() -> Result<Element<'a, Message>, anyhow::Error> {
         )
         .width(Length::Fill)
         .height(Length::Fill),
-        button("Importuoti absolventus").on_press(Message::Import),
+        row![
+            button("Importuoti absolventus").on_press(Message::Import),
+            button("Gauti informacija").on_press(Message::CreateWebDriver),
+        ]
+        .align_y(Vertical::Center)
+        .spacing(8)
+        .width(Length::Fill)
     ]
     .padding(16)
     .align_x(Horizontal::Center)

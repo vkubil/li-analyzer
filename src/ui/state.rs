@@ -1,4 +1,5 @@
 use iced::widget::pane_grid::{self};
+use thirtyfour::WebDriver;
 
 #[derive(Debug, Clone)]
 pub enum ToastType {
@@ -8,9 +9,11 @@ pub enum ToastType {
 
 #[derive(Debug, Clone)]
 pub enum Message {
+    CreateWebDriver,
+    FetchData(WebDriver),
     Import,
     Toast(ToastType, String),
-    Imported(Vec<String>),
+    AddGraduates(Vec<String>),
     PaneDragged(pane_grid::DragEvent),
     PaneResized(pane_grid::ResizeEvent),
 }

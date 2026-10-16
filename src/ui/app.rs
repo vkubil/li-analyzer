@@ -19,8 +19,3 @@ impl ApplicationState {
         ApplicationState { panes }
     }
 }
-impl Default for ApplicationState {
-    fn default() -> Self {
-        ApplicationState::new()
-    }
-}

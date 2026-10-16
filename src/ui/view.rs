@@ -13,7 +13,7 @@ use crate::ui::{
     state::Message,
 };
 
-pub fn view(state: &ApplicationState) -> Element<'_, Message> {
+pub fn view<'a>(state: &'a ApplicationState) -> Element<'a, Message> {
     column![
         PaneGrid::new(&state.panes, |_, pane, _| {
             let title = create_pane_title(pane);
@@ -43,10 +43,10 @@ pub fn view(state: &ApplicationState) -> Element<'_, Message> {
     .into()
 }
 
-pub fn create_pane_title(pane: &UiPane) -> Row<'_, Message> {
+pub fn create_pane_title<'a>(pane: &UiPane) -> Row<'a, Message> {
     row![text(pane.r#type.title()),].spacing(5)
 }
-pub fn create_pane_title_bar(title: Row<'_, Message>) -> TitleBar<'_, Message> {
+pub fn create_pane_title_bar<'a>(title: Row<'a, Message>) -> TitleBar<'a, Message> {
     pane_grid::TitleBar::new(title)
         .padding(10)
         .style(panes::style::pane_title_bar)
