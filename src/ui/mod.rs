@@ -3,6 +3,7 @@ pub mod functions;
 pub mod pages;
 pub mod panes;
 pub mod state;
+pub mod style;
 pub mod subscription;
 pub mod update;
 pub mod view;

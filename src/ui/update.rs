@@ -7,10 +7,25 @@ use log::info;
 
 use crate::ui::{
     app::ApplicationState,
-    functions,
+    functions::{self, remove_imports::remove_all_imported},
     state::{Message, ToastType},
 };
 
+macro_rules! handle_sync_errors {
+    ($expression: expr; $name: ident: $success: expr) => {
+        match $expression {
+            Ok($name) => $success,
+            Err(err) => {
+                return Task::done(Message::Toast(ToastType::Error, err.to_string()));
+            }
+        }
+    };
+}
+macro_rules! handle_sync_info {
+    ($expression: expr; $success: expr) => {
+        handle_sync_errors!($expression; _res: { return Task::done(Message::Toast(ToastType::Success, $success.to_string())); });
+    };
+}
 macro_rules! handle_errors {
     ($name: ident: $expression: expr) => {
         |result| match result {
@@ -25,6 +40,9 @@ pub fn update(state: &mut ApplicationState, message: Message) -> Task<Message> {
         Message::FetchData => {
             info!("Prisijungta su Selenium");
             Task::none()
+        }
+        Message::ClearImports => {
+            handle_sync_info!(remove_all_imported(); "Ištrinti importuoti absolventai");
         }
         Message::Toast(r#type, message) => {
             match r#type {

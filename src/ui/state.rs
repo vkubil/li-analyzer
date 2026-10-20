@@ -10,6 +10,7 @@ pub enum ToastType {
 pub enum Message {
     FetchData,
     Import,
+    ClearImports,
     Toast(ToastType, String),
     AddGraduates(Vec<String>),
     PaneDragged(pane_grid::DragEvent),

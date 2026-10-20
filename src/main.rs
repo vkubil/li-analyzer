@@ -40,7 +40,7 @@ async fn main() -> anyhow::Result<()> {
         crate::ui::update::update,
         crate::ui::view::view,
     )
-    .theme(Theme::CatppuccinMocha)
+    .theme(Theme::Dark)
     .subscription(subscription)
     .run()
     .map_err(|err| err.into())

@@ -7,11 +7,7 @@ use iced::{
     },
 };
 
-use crate::ui::{
-    app::ApplicationState,
-    panes::{self, UiPane},
-    state::Message,
-};
+use crate::ui::{app::ApplicationState, panes::UiPane, state::Message, style};
 
 pub fn view<'a>(state: &'a ApplicationState) -> Element<'a, Message> {
     column![
@@ -27,13 +23,13 @@ pub fn view<'a>(state: &'a ApplicationState) -> Element<'a, Message> {
                     container(text(format!("{:?}", err)))
                         .padding(8)
                         .width(Length::Fill)
-                        .style(panes::style::pane_error),
+                        .style(style::pane::error),
                 )
                 .padding(16)
                 .into(),
             })
             .title_bar(title_bar)
-            .style(panes::style::pane)
+            .style(style::pane::pane)
         })
         .spacing(8)
         .on_drag(Message::PaneDragged)
@@ -49,5 +45,5 @@ pub fn create_pane_title<'a>(pane: &UiPane) -> Row<'a, Message> {
 pub fn create_pane_title_bar<'a>(title: Row<'a, Message>) -> TitleBar<'a, Message> {
     pane_grid::TitleBar::new(title)
         .padding(10)
-        .style(panes::style::pane_title_bar)
+        .style(style::pane::title_bar)
 }
