@@ -1,6 +1,9 @@
 [logging]
 verbose = true
 
+[fetch]
+university_id=206433
+
 [database]
 url="file:data.db"
 

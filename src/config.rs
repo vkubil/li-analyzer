@@ -12,11 +12,16 @@ pub struct Config {
     pub credentials: ConfigCredentials,
     pub logging: ConfigLogging,
     pub database: ConfigDatabase,
+    pub fetch: ConfigFetch,
 }
 #[derive(Deserialize)]
 pub struct ConfigCredentials {
     pub email: String,
     pub password: String,
+}
+#[derive(Deserialize)]
+pub struct ConfigFetch {
+    pub university_id: u16,
 }
 #[derive(Deserialize)]
 pub struct ConfigLogging {
