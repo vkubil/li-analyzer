@@ -11,7 +11,7 @@ impl PaneType {
     pub fn title(&self) -> String {
         match self {
             PaneType::Data => "Duomenys".to_string(),
-            PaneType::Fetch => "Eksportavimas ir Importavimas".to_string(),
+            PaneType::Fetch => "Absolventų Importavimas".to_string(),
         }
     }
     pub fn view<'a>(&self) -> impl Fn() -> Result<Element<'a, Message>, anyhow::Error> {

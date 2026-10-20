@@ -1,6 +1,8 @@
+use std::{thread, time::Duration};
+
 use const_format::concatcp;
 use futures::future::join_all;
-use log::{debug, warn};
+use log::{info, warn};
 use thirtyfour::{
     By, WebDriver, WebElement,
     error::{WebDriverError, WebDriverErrorInner},
@@ -42,7 +44,7 @@ pub async fn authenticate_in_driver(
     )
     .await?;
 
-    debug!("Prisijungimo duomenys suvesti");
+    info!("Prisijungimo duomenys suvesti");
 
     // Nes sunku suzinoti, kuris is ju yra prisijungimo mygtukas, tai mums reikes perziureti visus mygtukus
     // ir rasti kuris is ju yra 'Sign in'
@@ -58,15 +60,15 @@ pub async fn authenticate_in_driver(
         .ok_or(LoginError::SignInButtonNotFound)
         .inspect_err(|e| log::error!("{}", e))?;
 
-    debug!("Spaudžiamas prisijungimo mygtukas");
+    info!("Spaudžiamas prisijungimo mygtukas");
     sign_in.click().await?;
 
-    debug!("Laukiama, kada pasikeis puslapis");
+    info!("Laukiama, kada pasikeis puslapis");
     wait_for_auth(driver).await?;
 
     // Gauti URL po paspaudimo
     let url = driver.current_url().await?;
-    debug!("Puslapis pasikeite. Naujas URL: {}", url);
+    info!("Puslapis pasikeite. Naujas URL: {}", url);
 
     if url.path().starts_with(CHECKPOINT_URL) {
         warn!(
@@ -75,7 +77,7 @@ pub async fn authenticate_in_driver(
         // Kad nereiketu ir cia paspausti enter ar panasiai
         wait_until_element_gone(driver, By::Id(CHALLENGE_PAGE_ID)).await?;
 
-        debug!("Įvykdytas patvirtinimas");
+        info!("Įvykdytas patvirtinimas");
         wait_for_flagship(driver).await?;
     }
 
@@ -86,14 +88,14 @@ pub async fn authenticate_in_driver(
 pub async fn wait_for_flagship(driver: &WebDriver) -> Result<(), anyhow::Error> {
     let url = driver.current_url().await?;
 
-    debug!("URL po patvirtinimo: {}", url);
+    info!("URL po patvirtinimo: {}", url);
     if url.path().starts_with(FLAGSHIP_URL) {
-        debug!("Flagship puslapis rastas");
+        info!("Flagship puslapis rastas");
 
         match wait_until_element_gone(driver, By::Id(PAGE_ID)).await {
             Err(e) => match e.into_inner() {
                 WebDriverErrorInner::Timeout(_) => {
-                    debug!("Flagship elementas nerastas");
+                    info!("Flagship elementas nerastas");
                 }
                 other => {
                     return Err(other.into());
@@ -114,8 +116,9 @@ pub async fn wait_for_auth(driver: &WebDriver) -> Result<(), anyhow::Error> {
         return Ok(());
     }
 
-    // Nera kaip kitaip suzinoti, kada puslapis pasikeicia
-    wait_until_element_gone(driver, By::Id(PAGE_ID)).await?;
+    thread::sleep(Duration::from_millis(500));
+    // // Nera kaip kitaip suzinoti, kada puslapis pasikeicia
+    // wait_until_element_gone(driver, By::Id(PAGE_ID)).await?;
 
     Ok(())
 }

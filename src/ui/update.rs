@@ -5,14 +5,10 @@ use iced::{
 use log::error;
 use log::info;
 
-use crate::{
-    config::CONFIG,
-    ui::{
-        app::ApplicationState,
-        functions,
-        state::{Message, ToastType},
-    },
-    web::{auth::authenticate_in_driver, create::create_web_driver},
+use crate::ui::{
+    app::ApplicationState,
+    functions,
+    state::{Message, ToastType},
 };
 
 macro_rules! handle_errors {
@@ -26,23 +22,7 @@ macro_rules! handle_errors {
 
 pub fn update(state: &mut ApplicationState, message: Message) -> Task<Message> {
     match message {
-        Message::CreateWebDriver => Task::perform(
-            async {
-                let web_driver = create_web_driver().await;
-
-                if let Err(e) = web_driver {
-                    return Err(e.into());
-                }
-
-                let web_driver = web_driver.unwrap();
-
-                authenticate_in_driver(&web_driver, &CONFIG.credentials)
-                    .await
-                    .map(|_| web_driver)
-            },
-            handle_errors!(driver: { Message::FetchData(driver) }),
-        ),
-        Message::FetchData(_) => {
+        Message::FetchData => {
             info!("Prisijungta su Selenium");
             Task::none()
         }

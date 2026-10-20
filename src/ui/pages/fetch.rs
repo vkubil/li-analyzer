@@ -27,8 +27,8 @@ pub fn view<'a>() -> Result<Element<'a, Message>, anyhow::Error> {
         .width(Length::Fill)
         .height(Length::Fill),
         row![
-            button("Importuoti absolventus").on_press(Message::Import),
-            button("Gauti informacija").on_press(Message::CreateWebDriver),
+            button("Importuoti").on_press(Message::Import),
+            button("Gauti informacija").on_press(Message::FetchData),
         ]
         .align_y(Vertical::Center)
         .spacing(8)
