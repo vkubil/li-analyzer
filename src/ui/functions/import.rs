@@ -3,7 +3,8 @@ use log::info;
 use regex::{Captures, Regex};
 use rfd::{AsyncFileDialog, FileHandle};
 
-const EXPRESSION: &str = "^(?:(?:https:\\/\\/linkedin.com\\/in)?[/])?([A-Za-z0-9\\-]+)(?:[/].*)?$";
+const EXPRESSION: &str =
+    "^(?:(?:https:\\/\\/(?:www[.])linkedin[.]com\\/in)?\\/)?([A-Za-z0-9\\-]+)(?:\\/.*)?$";
 
 pub async fn import_graduate_files() -> anyhow::Result<Vec<String>, anyhow::Error> {
     let files = AsyncFileDialog::new()
