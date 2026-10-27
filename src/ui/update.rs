@@ -7,7 +7,7 @@ use log::info;
 
 use crate::ui::{
     app::ApplicationState,
-    functions::{self, remove_imports::remove_all_imported},
+    functions::{self, fetch::fetch_all_graduates, remove_imports::remove_all_imported},
     state::{Message, ToastType},
 };
 
@@ -35,11 +35,14 @@ macro_rules! handle_errors {
     };
 }
 
-pub fn update(state: &mut ApplicationState, message: Message) -> Task<Message> {
+pub fn update<'a>(state: &'a mut ApplicationState, message: Message) -> Task<Message> {
     match message {
         Message::FetchData => {
-            info!("Prisijungta su Selenium");
-            Task::none()
+            let driver = state.driver.clone();
+            Task::perform(
+                fetch_all_graduates(driver),
+                handle_errors!(_value: Message::Toast(ToastType::Success, "Importuoti absolventai".to_string())),
+            )
         }
         Message::ClearImports => {
             handle_sync_info!(remove_all_imported(); "Ištrinti importuoti absolventai");

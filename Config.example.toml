@@ -3,6 +3,7 @@ verbose = true
 
 [fetch]
 university_id=206433
+tabs_to_open=2
 
 [database]
 url="file:data.db"
