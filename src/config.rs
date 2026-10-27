@@ -21,7 +21,7 @@ pub struct ConfigCredentials {
 }
 #[derive(Deserialize)]
 pub struct ConfigFetch {
-    pub university_id: u16,
+    pub university_id: i32,
 }
 #[derive(Deserialize)]
 pub struct ConfigLogging {

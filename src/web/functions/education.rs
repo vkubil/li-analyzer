@@ -40,7 +40,7 @@ pub async fn get_education_courses(
             "a[href=\"{}{}\"] > div p:nth-of-type(2)",
             BASE_URL, &CONFIG.fetch.university_id
         )))
-        .desc("Absolvento universiteto kurso elementas")
+        .desc("Absolvento universiteto kursas")
         .any()
         .await
         .map_err(|x| CourseError::WebDriverError(x))?;

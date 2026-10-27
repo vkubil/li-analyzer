@@ -1,19 +1,28 @@
-use thirtyfour::{
-    By, WebDriver, WebElement, error::WebDriverError, extensions::query::ElementQueryable,
-};
+use thirtyfour::{By, WebElement, error::WebDriverError, extensions::query::ElementQueryable};
 
-const WORKSPACE_ID: &str = "workspace";
+const EXPERIENCE_TIMELINE_ITEMS: &str = "ul li div:nth-of-type(2)";
 
-pub async fn get_details_page(driver: &WebDriver) -> Result<WebElement, WebDriverError> {
-    driver
-        .query(By::Id(WORKSPACE_ID))
-        .desc("Pagrindinis detaliu puslapio elementas")
-        .single()
+pub async fn get_timeline_items(
+    experience: &WebElement,
+) -> Result<Vec<WebElement>, WebDriverError> {
+    experience
+        .query(By::Css(EXPERIENCE_TIMELINE_ITEMS))
+        .desc("kelios patirtys vienoje kompanijoje")
+        .any()
         .await
 }
 
-// const WORKSPACE_ITEM_CSS: &str = "[componentkey^=\"entity-collection-item\"]";
-
-pub fn get_profile_details(profile_url: &str, page: &str) -> String {
-    format!("{}/details/{}/", profile_url, page)
+pub async fn get_headline_paragraphs_from(
+    element: &WebElement,
+) -> Result<Vec<WebElement>, WebDriverError> {
+    element
+        .query(By::Tag("a"))
+        .with_attribute("tabindex", "0")
+        .desc("patirties antraštė")
+        .first()
+        .await?
+        .query(By::Tag("p"))
+        .desc("patirties antraštės paragrafai")
+        .any()
+        .await
 }
