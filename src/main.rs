@@ -4,46 +4,40 @@ use crate::{
     web::{auth::authenticate_in_driver, create::create_web_driver},
 };
 use iced::Theme;
-use log::{error, info, warn};
-use thirtyfour::error::WebDriverErrorInner;
+use log::info;
 
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
+pub fn main() -> anyhow::Result<()> {
     create_logger(&CONFIG.logging);
-    let web_driver = create_web_driver().await;
 
-    if let Err(e) = web_driver {
-        return Err(e.into());
-    }
+    // Naudojant WebDriver funkcijas, gaunamas si klaida:
+    // Cannot start a runtime from within a runtime. This happens because a function (like `block_on`)
+    // attempted to block the current thread while the thread is being used to drive asynchronous tasks.
+    // Taigi, reikia naudoti runtime atskirta nuo iced runtime, kad galetume normaliai naudotis Selenium
+    let runtime = tokio::runtime::Runtime::new()?;
+    let handle = runtime.handle().clone();
 
-    let web_driver = web_driver.unwrap();
+    // Sukurti web driver tame runtime
+    let web_driver = handle.block_on(async {
+        let driver = create_web_driver().await?;
+        authenticate_in_driver(&driver, &CONFIG.credentials).await?;
+        Ok::<_, anyhow::Error>(driver)
+    })?;
 
-    authenticate_in_driver(&web_driver, &CONFIG.credentials).await?;
+    info!("Prisijungta");
 
-    match web_driver.clone().quit().await {
-        Ok(_) => {
-            info!("Prisijungta");
-        }
-        Err(e) => match e.into_inner() {
-            WebDriverErrorInner::Timeout(_) => {
-                warn!("Galimai neprisijungė");
-            }
-            e => {
-                error!("Klaida prisjungiant: {}", e);
-                Err(e)?;
-            }
-        },
-    }
-
-    iced::application(
-        move || ApplicationState::new(&web_driver),
+    let ui = iced::application(
+        move || ApplicationState::new(&web_driver, handle.clone()),
         crate::ui::update::update,
         crate::ui::view::view,
     )
     .theme(Theme::Dark)
     .subscription(subscription)
-    .run()
-    .map_err(|err| err.into())
+    .run();
+
+    // Kai baigesi UI session, reikia sustabdyti runtime
+    drop(runtime);
+
+    ui.map_err(|err| err.into())
 }
 
 pub mod config;

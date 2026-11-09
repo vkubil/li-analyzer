@@ -8,7 +8,7 @@ anyhow = "1.0.104"
 const_format = "0.2.36"
 env_logger = "0.11.11"
 futures = "0.3.34"
-iced = "0.14.0"
+iced = { version = "0.14.0", features = ["tokio"] }
 log = "0.4.34"
 serde = "1.0.229"
 thirtyfour = "0.37.5"
@@ -19,3 +19,4 @@ diesel = { version = "2.2.0", features = ["sqlite", "returning_clauses_for_sqlit
 rfd = "0.17.2"
 regex = "1.13.1"
 chrono = "0.4.45"
+rxrust = "1.0.0-rc.0"

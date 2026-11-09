@@ -39,8 +39,15 @@ pub fn update<'a>(state: &'a mut ApplicationState, message: Message) -> Task<Mes
     match message {
         Message::FetchData => {
             let driver = state.driver.clone();
+            let runtime = state.runtime.clone();
+
             Task::perform(
-                fetch_all_graduates(driver),
+                async move {
+                    runtime
+                        .spawn(fetch_all_graduates(driver))
+                        .await
+                        .map_err(anyhow::Error::from)?
+                },
                 handle_errors!(_value: Message::Toast(ToastType::Success, "Importuoti absolventai".to_string())),
             )
         }
