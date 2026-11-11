@@ -1,20 +1,21 @@
 use std::{iter, sync::Arc};
 
-use diesel::{RunQueryDsl, query_dsl::methods::SelectDsl};
 use futures::{
     future::{join_all, try_join_all},
     lock::Mutex,
 };
 use thirtyfour::{
     Cookie, WebDriver,
-    error::{WebDriverError, WebDriverErrorInfo, WebDriverResult},
+    error::{WebDriverError, WebDriverResult},
 };
 
 use crate::{
-    database::{connection::establish_connection, schema::imported_graduates},
-    web::{
-        create::create_web_driver, extensions::WebDriverCookieExtension, util::url::get_profile_url,
+    database::models::Graduate,
+    ui::functions::fetch::{
+        structure::GraduateInfo,
+        util::{create_driver_for_fetch, get_graduates_to_fetch},
     },
+    web::util::url::get_profile_url,
 };
 use log::{info, warn};
 
@@ -60,32 +61,16 @@ pub async fn fetch_all_graduates(
     Ok(())
 }
 
-pub async fn dispose_driver<'a>(driver: &'a WebDriver) -> WebDriverResult<()> {
+async fn dispose_driver<'a>(driver: &'a WebDriver) -> WebDriverResult<()> {
     driver.clone().close_window().await?;
     driver.clone().quit().await
 }
 
-pub async fn create_driver_for_fetch(cookies: &Arc<Vec<Cookie>>) -> WebDriverResult<WebDriver> {
-    let driver = create_web_driver().await?;
-
-    driver.clone().leak().map_err(|_| {
-        WebDriverError::UnknownError(WebDriverErrorInfo::new(
-            "Klaida leak'inant driverį užduočiai atlikti".to_string(),
-        ))
-    })?;
-    info!("Pridedami cookies");
-    driver.goto("https://linkedin.com").await?;
-    driver.add_all_cookies(cookies.iter()).await?;
-    info!("Prideti cookies");
-
-    Ok(driver)
-}
-
-pub async fn fetch_graduate_task<'a>(
+async fn fetch_graduate_task<'a>(
     driver: &'a WebDriver,
     graduates_volatile: &'a Arc<Mutex<Vec<String>>>,
-) -> Result<Vec<String>, WebDriverError> {
-    let mut titles = Vec::new();
+) -> Result<Vec<GraduateInfo>, WebDriverError> {
+    let mut graduates = Vec::new();
 
     loop {
         // Gauti graduate_id sitam tabui
@@ -99,28 +84,28 @@ pub async fn fetch_graduate_task<'a>(
             break;
         }
 
-        titles.push(fetch_single_graduate(&driver, &graduate_id.unwrap()).await?);
+        graduates.push(fetch_single_graduate(&driver, &graduate_id.unwrap()).await?);
     }
 
-    Ok(titles)
+    Ok(graduates)
 }
 
-pub async fn fetch_single_graduate<'a>(
+async fn fetch_single_graduate<'a>(
     driver: &'a WebDriver,
     graduate_id: &'a str,
-) -> Result<String, WebDriverError> {
+) -> Result<GraduateInfo, WebDriverError> {
     driver.goto(get_profile_url(&graduate_id)).await?;
     let title = driver.title().await?;
     let student_name = title.split('|').next().unwrap();
 
-    println!("Absolvento vardas: {:?}", student_name);
-    Ok(student_name.to_string())
-}
+    let graduate = Graduate {
+        id: graduate_id.to_string(),
+        full_name: student_name.to_string(),
+    };
 
-fn get_graduates_to_fetch() -> Result<Vec<String>, diesel::result::Error> {
-    let conn = &mut establish_connection();
-
-    imported_graduates::table
-        .select(imported_graduates::id)
-        .load::<String>(conn)
+    Ok(GraduateInfo {
+        graduate,
+        courses: vec![],
+        positions: vec![],
+    })
 }

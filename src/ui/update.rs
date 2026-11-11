@@ -7,7 +7,7 @@ use log::info;
 
 use crate::ui::{
     app::ApplicationState,
-    functions::{self, fetch::fetch_all_graduates, remove_imports::remove_all_imported},
+    functions::{self, fetch::function::fetch_all_graduates, remove_imports::remove_all_imported},
     state::{Message, ToastType},
 };
 
