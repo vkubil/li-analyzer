@@ -31,7 +31,7 @@ pub fn view<'a>() -> Result<Element<'a, Message>, anyhow::Error> {
                 .on_press(Message::ClearImports),
         ]
         .align_y(Vertical::Center)
-        .spacing(2)
+        .spacing(4)
         .width(Length::Fill),
         scrollable(
             table::table(

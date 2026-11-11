@@ -38,13 +38,13 @@ macro_rules! handle_errors {
 pub fn update<'a>(state: &'a mut ApplicationState, message: Message) -> Task<Message> {
     match message {
         Message::FetchData => {
-            let driver = state.driver.clone();
+            let cookies = state.cookies.clone();
             let runtime = state.runtime.clone();
 
             Task::perform(
                 async move {
                     runtime
-                        .spawn(fetch_all_graduates(driver))
+                        .spawn(fetch_all_graduates(cookies, 4, 2))
                         .await
                         .map_err(anyhow::Error::from)?
                 },

@@ -16,17 +16,24 @@ pub fn main() -> anyhow::Result<()> {
     let runtime = tokio::runtime::Runtime::new()?;
     let handle = runtime.handle().clone();
 
-    // Sukurti web driver tame runtime
-    let web_driver = handle.block_on(async {
+    // Sukurti web driver tame runtime ir gauti jo cookies, kuriuos panaudosime kitam kartui
+    let web_driver_cookies = handle.block_on(async {
         let driver = create_web_driver().await?;
+
         authenticate_in_driver(&driver, &CONFIG.credentials).await?;
-        Ok::<_, anyhow::Error>(driver)
+
+        let cookies = driver.get_all_cookies().await?;
+
+        // Nebereikia so driver
+        driver.close_window().await?;
+
+        Ok::<_, anyhow::Error>(cookies)
     })?;
 
     info!("Prisijungta");
 
     let ui = iced::application(
-        move || ApplicationState::new(&web_driver, handle.clone()),
+        move || ApplicationState::new(&web_driver_cookies, handle.clone()),
         crate::ui::update::update,
         crate::ui::view::view,
     )
