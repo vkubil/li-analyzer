@@ -3,7 +3,8 @@ use iced::Element;
 use crate::ui::{pages, state::Message};
 
 pub enum PaneType {
-    Fetch,
+    FetchGraduates,
+    FetchCourses,
     Data,
 }
 
@@ -11,13 +12,15 @@ impl PaneType {
     pub fn title(&self) -> String {
         match self {
             PaneType::Data => "Duomenys".to_string(),
-            PaneType::Fetch => "Absolventų Importavimas".to_string(),
+            PaneType::FetchGraduates => "Absolventų Importavimas".to_string(),
+            PaneType::FetchCourses => "Kursų Importavimas".to_string(),
         }
     }
     pub fn view<'a>(&self) -> impl Fn() -> Result<Element<'a, Message>, anyhow::Error> {
         match self {
             PaneType::Data => pages::data::view,
-            PaneType::Fetch => pages::fetch::view,
+            PaneType::FetchGraduates => pages::fetch_graduates::view,
+            PaneType::FetchCourses => pages::fetch_courses::view,
         }
     }
 }
@@ -25,7 +28,8 @@ impl ToString for PaneType {
     fn to_string(&self) -> String {
         match self {
             PaneType::Data => "Data".to_string(),
-            PaneType::Fetch => "Fetch".to_string(),
+            PaneType::FetchGraduates => "Fetch Graduates".to_string(),
+            PaneType::FetchCourses => "Fetch Courses".to_string(),
         }
     }
 }

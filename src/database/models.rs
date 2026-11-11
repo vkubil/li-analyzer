@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 use diesel::prelude::*;
 
 #[derive(Queryable, Selectable, Clone, Insertable, Debug)]
@@ -14,6 +16,7 @@ pub struct Graduate {
     pub id: String,
     pub full_name: String,
 }
+
 #[derive(Queryable, Selectable, Insertable, AsChangeset, Debug, Clone)]
 #[diesel(table_name = crate::database::schema::positions)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
@@ -44,11 +47,24 @@ pub struct Course {
     pub id: i32,
     pub name: String,
 }
+
+impl Hash for Course {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+impl PartialEq for Course {
+    fn eq(&self, other: &Self) -> bool {
+        self.id.eq(&other.id)
+    }
+}
+impl Eq for Course {}
+
 #[derive(Queryable, Selectable, Insertable, AsChangeset, Debug, Clone)]
 #[diesel(table_name = crate::database::schema::course_known_positions)]
 #[diesel(check_for_backend(diesel::sqlite::Sqlite))]
 pub struct CourseKnownPosition {
     pub id: i32,
-    pub name: String,
     pub course_id: i32,
+    pub name: String,
 }

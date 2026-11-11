@@ -1,2 +1,3 @@
 pub mod data;
-pub mod fetch;
+pub mod fetch_courses;
+pub mod fetch_graduates;
